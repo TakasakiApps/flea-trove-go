@@ -12,9 +12,12 @@ func (or *OrderRepository) CreateOrder(order *models.Order) int64 {
 
 func (or *OrderRepository) GetOrderById(orderId uint) (order *models.Order) {
 	var orderRes models.Order
-	or.db.Table(models.OrderTable).First(&models.Order{ID: orderId})
-
-	return &orderRes
+	tx := or.db.Table(models.OrderTable).Where("id = ?", orderId).First(&orderRes)
+	if tx.RowsAffected != 1 {
+		return nil
+	}
+	order = &orderRes
+	return
 }
 
 func (or *OrderRepository) GetOrderList() (orderList []models.Order) {
