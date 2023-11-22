@@ -32,7 +32,7 @@ func (or *OrderRepository) GetOrderByUser(user string) (orderList []models.Order
 
 func (or *OrderRepository) UpdateOrder(order *models.Order) int64 {
 	tx := or.db.Table(models.OrderTable).
-		Where("id = ?", order).
+		Where("id = ?", order.ID).
 		Select("*").
 		Omit("id", "created_at", "update_at", "delete_at", "user", "product_id").
 		Updates(order)
