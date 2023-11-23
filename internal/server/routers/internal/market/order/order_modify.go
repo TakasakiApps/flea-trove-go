@@ -7,7 +7,6 @@ import (
 	"github.com/TakasakiApps/flea-trove-go/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/hanakogo/exceptiongo"
-	"github.com/hanakogo/hanakoutilgo"
 	"time"
 )
 
@@ -19,22 +18,11 @@ func ctxQueryOrderById(c *gin.Context) (order *models.Order) {
 	if order == nil {
 		exceptiongo.ThrowMsgF[types.ResourceNotFoundError]("订单 %v 不存在", query.Id)
 	}
-	ctxOrderCheck(c, *order)
 	return
-}
-
-func ctxOrderCheck(c *gin.Context, order models.Order) {
-	value, _ := c.Get("user_account")
-	if order.User != hanakoutilgo.CastTo[string](value) {
-		exceptiongo.ThrowMsgF[types.NotPermittedError]("订单 %v 不是该用户的订单", order.ID)
-	}
 }
 
 var UpdateOrder gin.HandlerFunc = func(c *gin.Context) {
 	order := utils.CtxBindJson[models.Order](c)
-	if query := database.Order().GetOrderById(order.ID); query != nil {
-		ctxOrderCheck(c, *query)
-	}
 	effected := database.Order().UpdateOrder(order)
 	if effected != 1 {
 		exceptiongo.ThrowMsgF[types.ResourceNotFoundError]("更新订单 %v 失败", order.ID)
